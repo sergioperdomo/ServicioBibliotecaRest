@@ -27,15 +27,12 @@ public class UsuarioBook {
 
     @NotNull
     @Column(name = "identificacion_usuario")
-    private String indetificacionUsuario;
+    private String identificacionUsuario;
 
     @Column(name = "tipo_usuario")
     private Long tipoUsuario;
 
-    @Column(name = "fecha_incial")
-    private Date fechaInicial;
-
     @Column(name = "fecha_final")
-    private Date fechaFinal;
+    private Date fechaMaximaDevolucion;
 
 }

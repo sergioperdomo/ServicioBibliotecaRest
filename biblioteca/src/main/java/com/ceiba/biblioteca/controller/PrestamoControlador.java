@@ -1,12 +1,14 @@
 package com.ceiba.biblioteca.controller;
 
 
+import com.ceiba.biblioteca.DTO.MensajeDTO;
 import com.ceiba.biblioteca.DTO.UsuarioBookDTO;
 import com.ceiba.biblioteca.DTO.UsuarioBookInDTO;
 import com.ceiba.biblioteca.DTO.UsuarioBookOutDTO;
 import com.ceiba.biblioteca.service.Impl.PrestamosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +19,7 @@ public class PrestamoControlador  {
     private PrestamosService prestamosService;
 
     @PostMapping
-    public UsuarioBookOutDTO guardarUsuarioBook(@RequestBody UsuarioBookInDTO usuarioBookInDTO) throws Exception {
+    public ResponseEntity<Object> guardarUsuarioBook(@RequestBody UsuarioBookInDTO usuarioBookInDTO) throws Exception {
         return prestamosService.guardarUsuarioBook(usuarioBookInDTO);
     }
     @GetMapping(path = "/{id-prestamo}")

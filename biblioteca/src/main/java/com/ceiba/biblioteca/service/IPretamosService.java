@@ -11,7 +11,7 @@ public interface IPretamosService {
      * @param usuarioBookInDTO
      * @return
      */
-    MensajeDTO guardarUsuarioBook(UsuarioBookInDTO usuarioBookInDTO) throws Exception;
+    Object guardarUsuarioBook(UsuarioBookInDTO usuarioBookInDTO) throws Exception;
 
     /**
      * Retorna información del usario.

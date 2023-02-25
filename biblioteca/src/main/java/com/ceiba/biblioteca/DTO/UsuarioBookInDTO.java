@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class UsuarioBookInDTO {
 
     private String isbn;
-    private String indetificacionUsuario;
+    private String identificacionUsuario;
     private Long tipoUsuario;
 
 }

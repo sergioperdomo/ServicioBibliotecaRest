@@ -11,6 +11,5 @@ import java.util.List;
 @Repository
 public interface UsuarioBookRepository extends JpaRepository<UsuarioBook,Long> {
 
-    @Query(value = "SELECT * FROM usuariobook WHERE identificacion_usuario = :indetificacionUsuario", nativeQuery = true)
-    List<UsuarioBook> findUsuarioBookByIdentificacionUsuario(@Param("indetificacionUsuario") String indetificacionUsuario);
+    List<UsuarioBook> findUsuarioBookByIdentificacionUsuario(String indetificacionUsuario);
 }

@@ -131,6 +131,7 @@ class PrestamoTests {
         mvc.perform(MockMvcRequestBuilders
                 .get("/prestamo/" + resultadoPrestamo.getId())
                 .accept(MediaType.APPLICATION_JSON))
+
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())

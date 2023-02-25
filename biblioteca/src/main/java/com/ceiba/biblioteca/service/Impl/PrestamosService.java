@@ -8,9 +8,11 @@ import com.ceiba.biblioteca.service.IfechaService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -23,7 +25,7 @@ public class PrestamosService implements IPretamosService {
     private final IfechaService ifechaService;
 
     @Override
-    public MensajeDTO guardarUsuarioBook(UsuarioBookInDTO usuarioBookInDTO) throws Exception {
+    public ResponseEntity<Object> guardarUsuarioBook(UsuarioBookInDTO usuarioBookInDTO) throws Exception {
 
         if (Objects.isNull(usuarioBookInDTO)) {
             System.out.println("Error en parametro de entrada.");
@@ -32,8 +34,8 @@ public class PrestamosService implements IPretamosService {
 
         MensajeDTO mensajeDTO = validaciones(usuarioBookInDTO);
 
-        if (Objects.nonNull(mensajeDTO)) {
-            return mensajeDTO;
+        if (!Objects.isNull(mensajeDTO.getMensaje())) {
+            return ResponseEntity.status(400).body(mensajeDTO);
         }
 
         FechaDTO fechaVigencia = validacionFecha(usuarioBookInDTO);
@@ -41,37 +43,45 @@ public class PrestamosService implements IPretamosService {
         ModelMapper mapper = new ModelMapper();
 
         UsuarioBook usuarioBook = mapper.map(usuarioBookInDTO, UsuarioBook.class);
-        usuarioBook.setFechaFinal(fechaVigencia.getFecha());
+        usuarioBook.setFechaMaximaDevolucion(fechaVigencia.getFecha());
         usuarioBook.setTipoUsuario(usuarioBookInDTO.getTipoUsuario());
 
         usuarioBookRepository.save(usuarioBook);
 
         UsuarioBookOutDTO usuarioBookOutDTO = new UsuarioBookOutDTO();
         usuarioBookOutDTO.setId(usuarioBook.getId());
-        usuarioBookOutDTO.setFechaMaximaDevolucion(usuarioBook.getFechaFinal());
 
-        return mensajeDTO;
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        String date = formatter.format(usuarioBook.getFechaMaximaDevolucion());
+
+        usuarioBookOutDTO.setFechaMaximaDevolucion(date);
+
+        return ResponseEntity.status(200).body(usuarioBookOutDTO);
 
     }
 
     @Override
     public UsuarioBookDTO getUserBook(Long id) throws Exception {
         if (id == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error en parametro de entrada.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error en parametro de entrada");
         }
 
         try {
 
             Optional<UsuarioBook> usuarioBook = usuarioBookRepository.findById(id);
             if (Objects.isNull(usuarioBook)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no existe o no a prestado ningun libro.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Usuario no existe o no a prestado ningun libro");
             }
+
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            String date = formatter.format(usuarioBook.get().getFechaMaximaDevolucion());
+
             UsuarioBookDTO usuarioBookDTO = UsuarioBookDTO.builder()
                     .id(id)
                     .isbn(usuarioBook.get().getIsbn())
                     .tipoUsuario(usuarioBook.get().getTipoUsuario())
-                    .fechaMaximaDevolucion(usuarioBook.get().getFechaFinal())
-                    .identificacionUsuario(usuarioBook.get().getIndetificacionUsuario())
+                    .fechaMaximaDevolucion(date)
+                    .identificacionUsuario(usuarioBook.get().getIdentificacionUsuario())
                     .build();
 
             return usuarioBookDTO;
@@ -100,19 +110,19 @@ public class PrestamosService implements IPretamosService {
 
     }
 
-    private MensajeDTO validaciones(UsuarioBookInDTO usuarioBookInDTO) {
+    private MensajeDTO validaciones(UsuarioBookInDTO usuarioBookInDTO) throws Exception {
 
         MensajeDTO mensajeDTO = new MensajeDTO();
 
-        List<UsuarioBook> consulta = usuarioBookRepository.findUsuarioBookByIdentificacionUsuario(usuarioBookInDTO.getIndetificacionUsuario());
+        List<UsuarioBook> consulta = usuarioBookRepository.findUsuarioBookByIdentificacionUsuario(usuarioBookInDTO.getIdentificacionUsuario());
 
         if (usuarioBookInDTO.getTipoUsuario() == 3 && consulta.size() >= 1) {
-            mensajeDTO.setMensaje("El usuario con identificación " + usuarioBookInDTO.getIndetificacionUsuario() +
-                    " ya tiene libro prestado por lo cual no se le puede realizar otro préstamos.");
+            mensajeDTO.setMensaje("El usuario con identificación " + usuarioBookInDTO.getIdentificacionUsuario() +
+                    " ya tiene un libro prestado por lo cual no se le puede realizar otro préstamo");
         }
 
         if (usuarioBookInDTO.getTipoUsuario() > 3) {
-            mensajeDTO.setMensaje("Tipo de usuario no permitido en la biblioteca.");
+            mensajeDTO.setMensaje("Tipo de usuario no permitido en la biblioteca");
         }
 
         return mensajeDTO;

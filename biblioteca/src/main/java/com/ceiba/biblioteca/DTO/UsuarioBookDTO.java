@@ -13,7 +13,7 @@ public class UsuarioBookDTO {
     private  String isbn;
     private String identificacionUsuario;
     private Long tipoUsuario;
-    private Date fechaMaximaDevolucion;
+    private String fechaMaximaDevolucion;
 
 
 }

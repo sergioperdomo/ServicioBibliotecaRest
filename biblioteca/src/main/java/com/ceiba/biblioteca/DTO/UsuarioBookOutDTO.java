@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -13,6 +14,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class UsuarioBookOutDTO {
     private Long id;
-    private Date fechaMaximaDevolucion;
+    private String fechaMaximaDevolucion;
 
 }
